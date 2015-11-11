@@ -1,0 +1,32 @@
+#!/usr/bin/env jruby
+# Run: export BARCODE_SCANNER_ENV=development && ./bin/srv-start
+# Run: export BARCODE_SCANNER_ENV=production && ./bin/srv-start
+
+if ENV['BARCODE_SCANNER_ENV']
+  require 'pry'
+
+  $: << File.join(File.dirname(__FILE__), '..')
+  puts "BARCODE_SCANNER_ENV: #{ENV['BARCODE_SCANNER_ENV']}"
+
+  require 'config/config'
+  $config = Configuration.load_config(ENV['BARCODE_SCANNER_ENV'])
+
+  $zk_con = ENV['ZOOKEEPER_CONNECTION'] ? ENV['ZOOKEEPER_CONNECTION'] : $config['connection']['zookeeper']
+  $kf_con = ENV['KAFKA_CONNECTION'] ? ENV['KAFKA_CONNECTION'] : $config['connection']['kafka']
+  $sr_con = ENV['SCHEMA_REGISTRY_CONNECTION'] ? ENV['SCHEMA_REGISTRY_CONNECTION'] : $config['connection']['schema-registry']
+
+  # binding.pry
+
+  require 'java'
+  require 'json'
+  # require 'celluloid'
+
+
+  $: << 'lib'
+  require 'producer'
+
+  # run ApiServer::Application.adapter
+  Producer::produce_random
+else
+  puts 'Error: not found "BARCODE_SCANNER_ENV"!'
+end

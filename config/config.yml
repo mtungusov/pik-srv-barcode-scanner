@@ -1,0 +1,17 @@
+---
+defaults: &defaults
+  connection:
+    zookeeper: "192.168.2.184:2128"
+    kafka: "192.168.2.184:9092"
+    schema-registry: "192.168.2.184:8081"
+
+  kafka:
+    topic: "barcode-scanner"
+
+development:
+  <<: *defaults
+  kafka:
+    topic: dev-barcode-scanner
+
+production:
+  <<: *defaults
