@@ -6,7 +6,7 @@ if ENV['BARCODE_SCANNER_ENV']
   require 'pry'
 
   $: << File.join(File.dirname(__FILE__), '..')
-  puts "BARCODE_SCANNER_ENV: #{ENV['BARCODE_SCANNER_ENV']}"
+  puts "RUN in: #{ENV['BARCODE_SCANNER_ENV']}"
 
   require 'config/config'
   $config = Configuration.load_config(ENV['BARCODE_SCANNER_ENV'])
