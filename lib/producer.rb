@@ -1,4 +1,8 @@
 module Producer
+  require_relative 'producer/java_producer'
+
+  include Producer::JavaProducer
+
   module_function
 
   def produce_random
@@ -7,9 +11,9 @@ module Producer
     _produce_one(msg)
   end
 
-private
 
   def _produce_one(msg={})
+    JavaProducer::create
     puts "Produce message: #{msg}"
   end
 
