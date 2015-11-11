@@ -15,9 +15,10 @@ if ENV['BARCODE_SCANNER_ENV']
   $kf_con = ENV['KAFKA_CONNECTION'] ? ENV['KAFKA_CONNECTION'] : $config['connection']['kafka']
   $sr_con = ENV['SCHEMA_REGISTRY_CONNECTION'] ? ENV['SCHEMA_REGISTRY_CONNECTION'] : $config['connection']['schema-registry']
 
-  # binding.pry
+  binding.pry
 
   require 'java'
+  $CLASSPATH << "vendor/java/schema-registry/*"
   require 'json'
   # require 'celluloid'
 
