@@ -1,6 +1,5 @@
 #!/usr/bin/env jruby
 # Run: export BARCODE_SCANNER_ENV=development && ./bin/srv-start
-# Run: export BARCODE_SCANNER_ENV=production && ./bin/srv-start
 
 if ENV['BARCODE_SCANNER_ENV']
   require 'pry'
@@ -15,10 +14,11 @@ if ENV['BARCODE_SCANNER_ENV']
   $kf_con = ENV['KAFKA_CONNECTION'] ? ENV['KAFKA_CONNECTION'] : $config['connection']['kafka']
   $sr_con = ENV['SCHEMA_REGISTRY_CONNECTION'] ? ENV['SCHEMA_REGISTRY_CONNECTION'] : $config['connection']['schema-registry']
 
-  binding.pry
 
   require 'java'
-  $CLASSPATH << "vendor/java/schema-registry/*"
+  ENV['CLASSPATH'] = "./vendor/java/schema-registry/*"
+  # binding.pry
+
   require 'json'
   # require 'celluloid'
 
@@ -26,8 +26,21 @@ if ENV['BARCODE_SCANNER_ENV']
   $: << 'lib'
   require 'producer'
 
-  # run ApiServer::Application.adapter
+  # trap('SIGINT') do
+  #   puts "Wait 10 sec for clear shutdown"
+  #   # Shutdown command
+  #   #
+  #   sleep 10.0
+  #   puts "SHUTDOWN in #{Time.now}"
+  #   exit
+  # end
+
+
   Producer::produce_random
+  # loop do
+  #   sleep 1.0
+  # end
+
 else
   puts 'Error: not found "BARCODE_SCANNER_ENV"!'
 end
