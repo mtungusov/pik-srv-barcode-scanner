@@ -1,26 +1,24 @@
 # Commands
 
 ```
-./bin/kafka-topics --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic _schemas
+cd $KAFKA_HOME
 ```
 
 ```
-./bin/kafka-topics --zookeeper localhost:2181 --create --replication-factor 1 --partitions 1 --topic dev-barcode-scanner
+./bin/kafka-topics.sh --zookeeper kafka.dev:2181 --list
 ```
 
 ```
-./bin/kafka-avro-console-consumer --zookeeper localhost:2181 \
-  --from-beginning \
-  --topic dev-barcode-scanner
+./bin/kafka-topics.sh --zookeeper kafka.dev:2181 --create --replication-factor 1 --partitions 1 --topic dev-barcode-scanner
 ```
 
 ```
-./bin/kafka-avro-console-producer \
-  --broker-list localhost:9092 \
-  --topic dev-barcode-scanner \
-  --property value.schema='{"namespace": "barcode.pik-industry.ru", "name": "BarcodeScannerEvent", "type": "record", "doc": "This event from barcode scanner", "fields":  [{"name": "source", "type": "string", "doc": "Scanner ip address"}, {"name": "time", "type": "int", "doc": "Unixtime in seconds"}, {"name": "barcode", "type": "string", "doc": "Barcode from scanner"}]}'
+./bin/kafka-console-consumer.sh --zookeeper kafka.dev:2181 --topic dev-barcode-scanner --from-beginning
 ```
 
+```
+./bin/kafka-console-producer.sh --broker-list kafka.dev:9092 --topic dev-barcode-scanner
+```
 
 ```
 {"source":"192.168.254.4", "time":1447327450, "barcode":"000765685830"}
