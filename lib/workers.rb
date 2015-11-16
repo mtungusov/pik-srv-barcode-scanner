@@ -1,5 +1,7 @@
-module Workers; end
+module Workers
 
-class Workers::Producer
+class Producer
 
 end
+
+end # module Workers
