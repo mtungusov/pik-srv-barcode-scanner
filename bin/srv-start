@@ -25,6 +25,7 @@ if ENV['BARCODE_SCANNER_ENV']
 
   $: << 'lib'
   require 'producer'
+  require 'workers'
 
   $RUNNING = true
 
