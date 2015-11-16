@@ -26,20 +26,27 @@ if ENV['BARCODE_SCANNER_ENV']
   $: << 'lib'
   require 'producer'
 
-  # trap('SIGINT') do
-  #   puts "Wait 10 sec for clear shutdown"
-  #   # Shutdown command
-  #   #
-  #   sleep 10.0
-  #   puts "SHUTDOWN in #{Time.now}"
-  #   exit
-  # end
+  $RUNNING = true
 
+  trap('SIGINT') do
+    $RUNNING = false
+  end
 
-  Producer::produce_random
-  # loop do
-  #   sleep 1.0
-  # end
+  PRODUCER = Producer::open
+
+  while $RUNNING
+    Producer::produce_random(PRODUCER)
+    sleep 1.0
+  end
+
+  puts "Wait 10 sec for clear shutdown"
+  sleep 10.0
+
+  PRODUCER.close
+
+  puts "SHUTDOWN in #{Time.now}"
+  exit
+
 
 else
   puts 'Error: not found "BARCODE_SCANNER_ENV"!'

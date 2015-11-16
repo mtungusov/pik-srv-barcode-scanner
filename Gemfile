@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-# gem 'jruby-kafka'
+gem 'jruby-kafka'
 
 group :development do
   gem 'pry'

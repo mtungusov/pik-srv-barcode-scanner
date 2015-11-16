@@ -1,9 +1,9 @@
 ---
 defaults: &defaults
   connection:
-    zookeeper: "192.168.2.184:2128"
-    kafka: "192.168.2.184:9092"
-    schema-registry: "http://192.168.2.184:8081"
+    zookeeper: "kafka.dev:2128"
+    kafka: "kafka.dev:9092"
+    schema-registry: "http://kafka.dev:8081"
 
   kafka:
     topic: "barcode-scanner"
