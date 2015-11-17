@@ -17,37 +17,36 @@ if ENV['BARCODE_SCANNER_ENV']
 
   require 'java'
   ENV['CLASSPATH'] = "./vendor/java/schema-registry/*"
-  # binding.pry
 
   require 'json'
-  # require 'celluloid'
-
+  require 'celluloid/current'
 
   $: << 'lib'
-  require 'producer'
+
+  require 'logging'
+  Logging.supervise as: :logger
+  $log = Celluloid::Actor[:logger]
+
+  # require 'producer'
   require 'workers'
 
   $RUNNING = true
+
+  $log.info "Service starting..."
+  Workers::Producer.supervise as: :my_producer
+  # binding.pry
 
   trap('SIGINT') do
     $RUNNING = false
   end
 
-  PRODUCER = Producer::open
-
   while $RUNNING
-    Producer::produce_random(PRODUCER)
+    Celluloid::Actor[:my_producer].async.process
     sleep 1.0
   end
 
-  puts "Wait 10 sec for clear shutdown"
-  sleep 10.0
-
-  PRODUCER.close
-
-  puts "SHUTDOWN in #{Time.now}"
-  exit
-
+  Celluloid::Actor[:my_producer].shutdown
+  $log.info "SHUTDOWN in #{Time.now}"
 
 else
   puts 'Error: not found "BARCODE_SCANNER_ENV"!'

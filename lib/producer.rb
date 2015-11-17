@@ -6,7 +6,7 @@ module Producer
   def open
     producer = KafkaProducer.new
     producer.connect
-    puts 'producer connect'
+    $log.info 'producer connect'
     producer
   end
 
@@ -16,7 +16,7 @@ module Producer
 
   def _produce_one(producer, msg={})
     producer.send_message($config['kafka']['topic'], msg)
-    puts 'producer sent'
+    $log.info 'producer sent'
   end
 
   def _generate_random_msg
