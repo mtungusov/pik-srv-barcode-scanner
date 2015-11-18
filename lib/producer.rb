@@ -15,8 +15,8 @@ module Producer
   end
 
   def _produce_one(producer, msg={})
-    producer.send_message($config['kafka']['topic'], msg)
-    $log.info 'producer sent'
+    r, err = producer.send_message($config['kafka']['topic'], msg)
+    $log.info "producer sent: #{msg}"
   end
 
   def _generate_random_msg

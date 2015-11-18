@@ -24,25 +24,26 @@ if ENV['BARCODE_SCANNER_ENV']
   $: << 'lib'
 
   require 'logging'
+
+  binding.pry
+
+  require 'workers'
+
   Logging.supervise as: :logger
   $log = Celluloid::Actor[:logger]
-
-  # require 'producer'
-  require 'workers'
+  $log.info "Service starting..."
 
   $RUNNING = true
 
-  $log.info "Service starting..."
   Workers::Producer.supervise as: :my_producer
-  # binding.pry
 
   trap('SIGINT') do
     $RUNNING = false
   end
 
   while $RUNNING
-    Celluloid::Actor[:my_producer].async.process
-    sleep 1.0
+    Celluloid::Actor[:my_producer].async.process_random
+    sleep 2.0
   end
 
   Celluloid::Actor[:my_producer].shutdown

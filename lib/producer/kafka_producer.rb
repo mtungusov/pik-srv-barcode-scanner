@@ -2,6 +2,7 @@ Dir["vendor/kafka/*.jar"].each { |jar| require jar }
 
 class Producer::KafkaProducer
   java_import 'org.apache.kafka.clients.producer.ProducerRecord'
+  java_import 'java.util.concurrent.TimeUnit'
 
   KAFKA_PRODUCER = Java::org.apache.kafka.clients.producer.KafkaProducer
 
@@ -19,7 +20,7 @@ class Producer::KafkaProducer
     serializer.class
   ]
 
-  attr_reader :options, :producer, :send_method
+  attr_reader :options, :producer, :send_method, :send_timeout
 
   def initialize(producer_options={})
     @options = producer_options.dup
@@ -28,6 +29,7 @@ class Producer::KafkaProducer
     @options['key.serializer'] = 'org.apache.kafka.common.serialization.StringSerializer'
     @options['value.serializer'] = 'org.apache.kafka.common.serialization.StringSerializer'
     @options['bootstrap.servers'] = $config['connection']['kafka']
+    @send_timeout = $config['connection']['timeout_in_ms']
 
     _validate_options
     @send_method = proc { throw StandardError.new 'Error: producer is not connected!' }
@@ -49,12 +51,25 @@ class Producer::KafkaProducer
 
     key = message[:source]
     data = _create_data(message)
-    r = ProducerRecord.new(topic, key, data)
-    send_method.call(r)
+    _send_msg(ProducerRecord.new(topic, key, data))
   end
 
   def _create_data(message)
     message.to_json
+  end
+
+  def _send_msg_async(product_record)
+    send_method.call(r)
+  end
+
+  def _send_msg(product_record)
+    err = nil
+    begin
+      result = send_method.call(r).get(send_timeout, TimeUnit::MILLISECONDS)
+    rescue Exception => e
+      err = { error: e.message }
+    end
+    [result, err]
   end
 
   def _validate_options

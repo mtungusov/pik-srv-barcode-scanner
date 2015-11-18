@@ -1,26 +1,33 @@
+require 'producer'
+
 module Workers; end
 
 class Workers::Producer
   include Celluloid
   include Celluloid::Internals::Logger
 
+  attr_reader :producer
+
   finalizer :close_all
 
   def initialize
     info "Starting up..."
+    @producer = Producer.open
   end
 
-  def process
-    info "Processing..."
+  def process_random
+    Producer.produce_random(producer)
   end
 
   def shutdown
     info "Shuting down begin..."
+    producer.close
     sleep 2.0
     info "Shuting complete!"
   end
 
   def close_all
+    producer.close
     info "Finalize"
   end
 end

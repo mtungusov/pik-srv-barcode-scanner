@@ -4,6 +4,7 @@ defaults: &defaults
     zookeeper: "kafka.dev:2128"
     kafka: "kafka.dev:9092"
     schema-registry: "http://kafka.dev:8081"
+    timeout_in_ms: 500
 
   kafka:
     topic: "barcode-scanner"
