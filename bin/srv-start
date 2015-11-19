@@ -27,6 +27,8 @@ if ENV['BARCODE_SCANNER_ENV']
 
   # binding.pry
 
+  require 'producer'
+  require 'producer/state_store'
   require 'workers'
 
   Logging.supervise as: :logger
@@ -35,18 +37,19 @@ if ENV['BARCODE_SCANNER_ENV']
 
   $RUNNING = true
 
-  Workers::Producer.supervise as: :my_producer
+  Workers::Producer.supervise as: :kafka_producer
+  Producer::StateStore.supervise as: :queue_store, args: [:kafka_producer]
 
   trap('SIGINT') do
     $RUNNING = false
   end
 
   while $RUNNING
-    Celluloid::Actor[:my_producer].async.process_random
+    Celluloid::Actor[:queue_store].async.push_and_send(Producer::generate_random_msg)
     sleep 2.0
   end
 
-  Celluloid::Actor[:my_producer].shutdown
+  Celluloid::Actor[:kafka_producer].shutdown
   $log.info "SHUTDOWN in #{Time.now}"
 
 else

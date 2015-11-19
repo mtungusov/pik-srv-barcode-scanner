@@ -15,24 +15,22 @@ class Workers::Producer
     info "Starting up..."
     @producer = Producer::KafkaProducer.new
     producer.connect
-    $log.info 'producer connect'
+    $log.info "producer connect"
   end
 
   def process_random
     msg = Producer::generate_random_msg
-    r, e = producer.send_message($config['kafka']['topic'], msg)
+    send_message(msg)
+  end
+
+  def send_message(message)
+    r, e = producer.send_message($config['kafka']['topic'], message)
     if e
       error e[:error]
       return 1
     end
-    info "producer sent: #{msg}, offset: #{r.offset}"
+    info "producer sent: #{message}, offset: #{r.offset}"
     return 0
-  end
-
-  def send_from_queue
-    # Get message from queue
-    # Try send
-    # If failure -> Put to queue && log.warn
   end
 
   def shutdown
