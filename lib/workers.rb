@@ -1,4 +1,5 @@
 require 'producer'
+require 'producer/kafka_producer'
 
 module Workers; end
 
@@ -12,11 +13,26 @@ class Workers::Producer
 
   def initialize
     info "Starting up..."
-    @producer = Producer.open
+    @producer = Producer::KafkaProducer.new
+    producer.connect
+    $log.info 'producer connect'
   end
 
   def process_random
-    Producer.produce_random(producer)
+    msg = Producer::generate_random_msg
+    r, e = producer.send_message($config['kafka']['topic'], msg)
+    if e
+      error e[:error]
+      return 1
+    end
+    info "producer sent: #{msg}, offset: #{r.offset}"
+    return 0
+  end
+
+  def send_from_queue
+    # Get message from queue
+    # Try send
+    # If failure -> Put to queue && log.warn
   end
 
   def shutdown
@@ -30,6 +46,7 @@ class Workers::Producer
     producer.close
     info "Finalize"
   end
+
 end
 
 # class Workers::BarcodeGroup < Celluloid::Supervision::Container

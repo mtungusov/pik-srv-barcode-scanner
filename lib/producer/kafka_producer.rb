@@ -1,5 +1,7 @@
 Dir["vendor/kafka/*.jar"].each { |jar| require jar }
 
+module Producer; end
+
 class Producer::KafkaProducer
   java_import 'org.apache.kafka.clients.producer.ProducerRecord'
   java_import 'java.util.concurrent.TimeUnit'
@@ -59,13 +61,13 @@ class Producer::KafkaProducer
   end
 
   def _send_msg_async(product_record)
-    send_method.call(r)
+    send_method.call(product_record)
   end
 
   def _send_msg(product_record)
     err = nil
     begin
-      result = send_method.call(r).get(send_timeout, TimeUnit::MILLISECONDS)
+      result = send_method.call(product_record).get(send_timeout, TimeUnit::MILLISECONDS)
     rescue Exception => e
       err = { error: e.message }
     end
