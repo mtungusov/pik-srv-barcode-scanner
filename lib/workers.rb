@@ -9,7 +9,7 @@ class Workers::Producer
 
   attr_reader :producer
 
-  finalizer :close_all
+  # finalizer :close_all
 
   def initialize
     info "Starting up..."
@@ -35,15 +35,15 @@ class Workers::Producer
 
   def shutdown
     info "Shuting down begin..."
-    producer.close
+    # producer.close
     sleep 2.0
     info "Shuting complete!"
   end
 
-  def close_all
-    producer.close
-    info "Finalize"
-  end
+  # def close_all
+  #   producer.close
+  #   info "Finalize"
+  # end
 
 end
 

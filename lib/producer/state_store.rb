@@ -10,6 +10,7 @@ class Producer::StateStore
   def initialize(worker)
     @queue = Queue.new
     @producer = worker
+    _load
   end
 
   def size
@@ -21,12 +22,37 @@ class Producer::StateStore
     _send_messages
   end
 
-  def save
+  def to_json
+    result = []
+    while !queue.empty?
+      msg = _pop
+      result << msg if msg
+    end
+    result.empty? ? nil : result.to_json
+  end
 
+  def save
+    data = to_json
+    return unless data
+    f = File.open($config["file-state-name"], "w")
+    f.write data
+  ensure
+    f.close unless f.nil?
   end
 
   def _load
-
+    return unless File.exist?($config["file-state-name"])
+    begin
+      f = File.open($config["file-state-name"], "r")
+      data = JSON(f.read)
+      data.each { |m| _push m }
+      info "Into Queue loaded #{data.count} messages"
+      File.delete($config["file-state-name"])
+    rescue Exception => e
+      error e.message
+    ensure
+      f.close
+    end
   end
 
   def _pop

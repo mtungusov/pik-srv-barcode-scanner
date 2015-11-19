@@ -50,6 +50,7 @@ if ENV['BARCODE_SCANNER_ENV']
   end
 
   Celluloid::Actor[:kafka_producer].shutdown
+  Celluloid::Actor[:queue_store].save
   $log.info "SHUTDOWN in #{Time.now}"
 
 else

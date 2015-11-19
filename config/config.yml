@@ -9,6 +9,8 @@ defaults: &defaults
   kafka:
     topic: "barcode-scanner"
 
+  file-state-name: "state-store.json"
+
 development:
   <<: *defaults
   kafka:
